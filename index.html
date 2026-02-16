@@ -4,21 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>さあやへ</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;700&family=Zen+Maru+Gothic:wght@300;400;700&display=swap" rel="stylesheet">
     
-    <!-- Babel for in-browser transpilation -->
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Babel for in-browser JSX support -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
     <script>
-      // Fix for process.env in browser environment
-      window.process = {
-        env: {
-          // IMPORTANT: Replace this with your actual Gemini API Key for GitHub Pages deployment
-          API_KEY: 'INSERISCI_QUI_LA_TUA_CHIAVE_API' 
-        }
-      };
-
       tailwind.config = {
         theme: {
           extend: {
@@ -35,6 +35,8 @@
             animation: {
               'twinkle': 'twinkle 3s ease-in-out infinite',
               'float': 'float 6s ease-in-out infinite',
+              'fadeIn': 'fadeIn 2s ease-in forwards',
+              'pulse': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
             },
             keyframes: {
               twinkle: {
@@ -44,6 +46,10 @@
               float: {
                 '0%, 100%': { transform: 'translateY(0)' },
                 '50%': { transform: 'translateY(-10px)' },
+              },
+              fadeIn: {
+                '0%': { opacity: 0 },
+                '100%': { opacity: 1 },
               }
             }
           },
@@ -72,21 +78,283 @@
         background: #555;
       }
     </style>
-  <script type="importmap">
+<script type="importmap">
 {
   "imports": {
-    "react/": "https://esm.sh/react@^19.2.4/",
-    "react": "https://esm.sh/react@^19.2.4",
+    "lucide-react": "https://esm.sh/lucide-react@^0.564.0",
     "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
     "@google/genai": "https://esm.sh/@google/genai@^1.41.0",
-    "lucide-react": "https://esm.sh/lucide-react@^0.564.0"
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4"
   }
 }
 </script>
 </head>
   <body>
     <div id="root"></div>
-    <!-- Load the app with Babel handling TSX -->
-    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./index.tsx"></script>
+
+    <script type="text/babel">
+      const { useState, useEffect, useRef } = React;
+
+      // --- DATA ---
+      const POEMS = [
+        {
+          id: 'main-1',
+          title: "君の帰る場所",
+          content: `君が此処に居るだけで
+世界の真ん中が輝く
+君を微笑ませることは
+暗闇に太陽を灯すこと
+
+それは毎日の朝が来る
+たった一つの楽しみ
+それは、大河の安らぎと強さに
+耳を澄まし、ただ見とれるよう
+
+言葉も要らない静かさで
+生きているだけで繋がる
+たとえ百万の星の海へ、君が逃げ去っても
+夜空が光を灯す度、私には分かる
+
+君だけを、必ず見つけ出す
+他の誰でもない君を
+
+だから落ちておいで
+君が流れ星になるなら
+この手で全て受け止めるから
+永遠に
+
+此処が君の帰る場所`,
+        },
+        {
+          id: 'main-2',
+          title: "君がくれる魔法",
+          content: `多くの人にとって、愛がどういうものなのかを考えていました。
+誰かに愛されていると感じた途端、もう「到達した」と思って努力をやめてしまう人がいます。
+反対に、ずっと走り続けて自分を高めようとする人もいるけれど、それは心の奥で「自分は十分じゃない」と怖がっていて、相手を失う不安に縛られているからなんだと思います。
+
+でも、君と一緒にいて、僕は第三の道を見つけました。
+それが、本当に大切な唯一の道です。
+
+君はこの世界にあるすべての“いいもの”そのもので、欠点も含めて、ありのままの僕を受け入れてくれる。
+そしてね、その魔法はここにあります。
+君が僕に「変われ」と求めないこと。
+完全に受け入れられていると感じられること。
+
+それこそが、僕を「もっと良くなりたい」と思わせてくれるんです。
+怖いからじゃない。
+感謝しているから。
+
+君の受け入れてくれる気持ちが、僕にとっていちばんの原動力です。
+義務だからじゃない。
+君にふさわしいものを、もっとたくさんあげたいと思うから。`,
+        }
+      ];
+
+      // --- ICONS (SVG inline to avoid dependencies) ---
+      const StarIcon = ({ className }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+        </svg>
+      );
+
+      const HeartIcon = ({ className, fill }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill={fill || "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+        </svg>
+      );
+
+      const ChevronDownIcon = ({ className }) => (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      );
+
+      // --- COMPONENTS ---
+
+      const StarryBackground = () => {
+        const canvasRef = useRef(null);
+
+        useEffect(() => {
+          const canvas = canvasRef.current;
+          if (!canvas) return;
+
+          const ctx = canvas.getContext('2d');
+          if (!ctx) return;
+
+          let animationFrameId;
+          let stars = [];
+          let width = window.innerWidth;
+          let height = window.innerHeight;
+
+          const initStars = () => {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+            
+            const starCount = Math.floor((width * height) / 3000); 
+            stars = [];
+            for (let i = 0; i < starCount; i++) {
+              stars.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                radius: Math.random() * 1.5 + 0.5,
+                opacity: Math.random(),
+                speed: Math.random() * 0.05 + 0.01,
+              });
+            }
+          };
+
+          const draw = () => {
+            ctx.clearRect(0, 0, width, height);
+            
+            const gradient = ctx.createLinearGradient(0, 0, 0, height);
+            gradient.addColorStop(0, '#050510');
+            gradient.addColorStop(1, '#1a1a2e');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.fillStyle = '#ffffff';
+            
+            stars.forEach((star) => {
+              ctx.globalAlpha = star.opacity;
+              ctx.beginPath();
+              ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+              ctx.fill();
+
+              star.opacity += (Math.random() - 0.5) * 0.05;
+              if (star.opacity < 0.1) star.opacity = 0.1;
+              if (star.opacity > 1) star.opacity = 1;
+
+              star.y -= star.speed;
+              if (star.y < 0) star.y = height;
+            });
+
+            animationFrameId = requestAnimationFrame(draw);
+          };
+
+          initStars();
+          draw();
+
+          const handleResize = () => {
+            initStars();
+          };
+
+          window.addEventListener('resize', handleResize);
+
+          return () => {
+            window.removeEventListener('resize', handleResize);
+            cancelAnimationFrame(animationFrameId);
+          };
+        }, []);
+
+        return (
+          <canvas
+            ref={canvasRef}
+            className="fixed top-0 left-0 w-full h-full -z-10 pointer-events-none"
+          />
+        );
+      };
+
+      const PoemCard = ({ poem, isMain = false }) => {
+        return (
+          <div className={`relative p-8 md:p-12 rounded-lg backdrop-blur-sm bg-white/5 border border-white/10 shadow-2xl transition-all duration-700 hover:bg-white/10 ${isMain ? 'max-w-3xl' : 'max-w-xl'} mx-auto w-full`}>
+            {/* Decorative corners */}
+            <div className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-rose/50 rounded-tl-lg"></div>
+            <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-rose/50 rounded-tr-lg"></div>
+            <div className="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-rose/50 rounded-bl-lg"></div>
+            <div className="absolute bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-rose/50 rounded-br-lg"></div>
+
+            <div className="text-center mb-8">
+              <div className="inline-block animate-pulse">
+                <HeartIcon className="w-6 h-6 text-rose mx-auto mb-4" fill="#e17055" />
+              </div>
+              <h2 className={`font-display text-3xl md:text-4xl lg:text-5xl text-starlight mb-2 ${isMain ? 'tracking-widest' : ''}`}>
+                {poem.title}
+              </h2>
+              <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-rose to-transparent mx-auto mt-4"></div>
+            </div>
+
+            <div className="prose prose-invert mx-auto">
+              <p className="font-serif text-lg md:text-xl leading-loose text-gray-200 text-center whitespace-pre-line">
+                {poem.content}
+              </p>
+            </div>
+
+            {isMain && (
+              <div className="mt-12 text-center">
+                <p className="text-sm font-sans text-rose/80 tracking-widest uppercase">Forever Yours</p>
+              </div>
+            )}
+          </div>
+        );
+      };
+
+      const App = () => {
+        const poemRef = useRef(null);
+
+        const scrollToPoem = () => {
+          poemRef.current?.scrollIntoView({ behavior: 'smooth' });
+        };
+
+        return (
+          <div className="min-h-screen relative text-starlight selection:bg-rose/30">
+            <StarryBackground />
+
+            {/* Navigation / Header - Minimalist */}
+            <nav className="fixed top-0 w-full p-6 z-50 flex justify-between items-center mix-blend-difference opacity-0 animate-[fadeIn_2s_ease-in_forwards]">
+              <span className="font-display font-bold text-lg tracking-widest text-white">SAAYA</span>
+            </nav>
+
+            <main className="relative z-10">
+              {/* Hero Section */}
+              <section className="h-screen flex flex-col items-center justify-center relative px-4 text-center">
+                <div className="space-y-6 animate-[float_6s_ease-in-out_infinite]">
+                  <div className="flex justify-center mb-4">
+                    <StarIcon className="w-8 h-8 text-rose animate-twinkle" />
+                  </div>
+                  <h1 className="font-display text-5xl md:text-8xl lg:text-9xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-starlight via-white to-gray-400 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+                    さあやへ
+                  </h1>
+                  <p className="font-serif font-light text-lg md:text-2xl text-gray-400 max-w-lg mx-auto leading-relaxed">
+                    私が紡ぐ言葉はすべて、君のもとへ還る。
+                  </p>
+                </div>
+                
+                <button 
+                  onClick={scrollToPoem}
+                  className="absolute bottom-12 left-1/2 -translate-x-1/2 text-gray-500 hover:text-rose transition-colors duration-500 animate-bounce cursor-pointer"
+                  aria-label="Read Poem"
+                >
+                  <ChevronDownIcon className="w-10 h-10" />
+                </button>
+              </section>
+
+              {/* Poems Section */}
+              <div ref={poemRef} className="flex flex-col gap-20 py-20">
+                {POEMS.map((poem, index) => (
+                  <section key={poem.id} className="min-h-[80vh] flex items-center justify-center px-4 md:px-8">
+                    <PoemCard poem={poem} isMain={true} />
+                  </section>
+                ))}
+              </div>
+
+              {/* Footer */}
+              <footer className="py-12 text-center text-gray-600 font-sans text-xs tracking-widest uppercase">
+                <p>愛と星屑を込めて</p>
+              </footer>
+            </main>
+          </div>
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById('root'));
+      root.render(
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>
+      );
+    </script>
   </body>
 </html>
