@@ -1,13 +1,11 @@
 import React, { useRef } from 'react';
-import StarryBackground from './components/StarryBackground';
-import PoemCard from './components/PoemCard';
-import AIPoemGenerator from './components/AIPoemGenerator';
-import { POEMS } from './constants';
+import StarryBackground from './components/StarryBackground.tsx';
+import PoemCard from './components/PoemCard.tsx';
+import { POEMS } from './constants.ts';
 import { ChevronDown, Star } from 'lucide-react';
 
 const App: React.FC = () => {
   const poemRef = useRef<HTMLDivElement>(null);
-  const generatorRef = useRef<HTMLDivElement>(null);
 
   const scrollToPoem = () => {
     poemRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -57,17 +55,6 @@ const App: React.FC = () => {
             </section>
           ))}
         </div>
-
-        {/* AI Generator Section */}
-        <section ref={generatorRef} className="min-h-[80vh] flex flex-col items-center justify-center py-20 px-4 bg-gradient-to-t from-black/80 to-transparent">
-          <div className="mb-12 text-center max-w-2xl">
-            <h2 className="font-display text-3xl md:text-4xl mb-4">言葉の宇宙</h2>
-            <p className="font-serif text-gray-400 text-lg">
-              心がいっぱいで言葉にならない時、星たちが新しい詩を紡ぎます。
-            </p>
-          </div>
-          <AIPoemGenerator />
-        </section>
 
         {/* Footer */}
         <footer className="py-12 text-center text-gray-600 font-sans text-xs tracking-widest uppercase">

@@ -6,7 +6,19 @@
     <title>さあやへ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;700&family=Zen+Maru+Gothic:wght@300;400;700&display=swap" rel="stylesheet">
+    
+    <!-- Babel for in-browser transpilation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
     <script>
+      // Fix for process.env in browser environment
+      window.process = {
+        env: {
+          // IMPORTANT: Replace this with your actual Gemini API Key for GitHub Pages deployment
+          API_KEY: 'INSERISCI_QUI_LA_TUA_CHIAVE_API' 
+        }
+      };
+
       tailwind.config = {
         theme: {
           extend: {
@@ -74,5 +86,7 @@
 </head>
   <body>
     <div id="root"></div>
+    <!-- Load the app with Babel handling TSX -->
+    <script type="text/babel" data-type="module" data-presets="typescript,react" src="./index.tsx"></script>
   </body>
 </html>

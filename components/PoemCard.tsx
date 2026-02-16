@@ -1,5 +1,5 @@
 import React from 'react';
-import { Poem } from '../types';
+import { Poem } from '../types.ts';
 import { Heart } from 'lucide-react';
 
 interface PoemCardProps {

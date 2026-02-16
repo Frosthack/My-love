@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { GeneratorStatus } from '../types';
-import { generatePoem } from '../services/geminiService';
+import { GeneratorStatus } from '../types.ts';
+import { generatePoem } from '../services/geminiService.ts';
 import { Sparkles, PenTool, Loader2, Send } from 'lucide-react';
-import { SAMPLE_PROMPTS } from '../constants';
+import { SAMPLE_PROMPTS } from '../constants.ts';
 
 const AIPoemGenerator: React.FC = () => {
   const [prompt, setPrompt] = useState('');
