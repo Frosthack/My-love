@@ -8,17 +8,16 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Fonts -->
+    <!-- Fonts: Shippori Mincho per un tocco letterario giapponese -->
     <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;700&family=Zen+Maru+Gothic:wght@300;400;700&display=swap" rel="stylesheet">
     
-    <!-- React & ReactDOM (UMD - No build required) -->
+    <!-- React & ReactDOM (Versione UMD per compatibilità universale) -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     
-    <!-- Babel (Compiles JSX in browser) -->
+    <!-- Babel per JSX nel browser -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- Tailwind Config -->
     <script>
       tailwind.config = {
         theme: {
@@ -29,28 +28,27 @@
               sans: ['"Zen Maru Gothic"', 'sans-serif'],
             },
             colors: {
-              night: '#0a0a1a',
+              night: '#050510',
               starlight: '#fdf6e3',
               rose: '#e17055',
             },
             animation: {
-              'twinkle': 'twinkle 3s ease-in-out infinite',
-              'float': 'float 6s ease-in-out infinite',
-              'fadeIn': 'fadeIn 2s ease-in forwards',
-              'pulse': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'twinkle': 'twinkle 4s ease-in-out infinite',
+              'float': 'float 8s ease-in-out infinite',
+              'fadeIn': 'fadeIn 3s ease-out forwards',
             },
             keyframes: {
               twinkle: {
-                '0%, 100%': { opacity: 0.5, transform: 'scale(1)' },
-                '50%': { opacity: 1, transform: 'scale(1.2)' },
+                '0%, 100%': { opacity: 0.3, transform: 'scale(1)' },
+                '50%': { opacity: 0.8, transform: 'scale(1.1)' },
               },
               float: {
                 '0%, 100%': { transform: 'translateY(0)' },
-                '50%': { transform: 'translateY(-10px)' },
+                '50%': { transform: 'translateY(-15px)' },
               },
               fadeIn: {
-                '0%': { opacity: 0 },
-                '100%': { opacity: 1 },
+                '0%': { opacity: 0, transform: 'translateY(20px)' },
+                '100%': { opacity: 1, transform: 'translateY(0)' },
               }
             }
           },
@@ -64,29 +62,18 @@
         color: #fdf6e3;
         overflow-x: hidden;
       }
-      /* Custom scrollbar */
-      ::-webkit-scrollbar {
-        width: 8px;
-      }
-      ::-webkit-scrollbar-track {
-        background: #0a0a1a;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #333;
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #555;
-      }
+      ::-webkit-scrollbar { width: 5px; }
+      ::-webkit-scrollbar-track { background: #050510; }
+      ::-webkit-scrollbar-thumb { background: #e1705555; border-radius: 10px; }
+      .poem-section { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
     </style>
 <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@^19.2.4",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
-    "react/": "https://esm.sh/react@^19.2.4/",
     "@google/genai": "https://esm.sh/@google/genai@^1.41.0",
-    "lucide-react": "https://esm.sh/lucide-react@^0.564.0"
+    "react": "https://esm.sh/react@^19.2.4",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.570.0"
   }
 }
 </script>
@@ -97,268 +84,177 @@
     <script type="text/babel">
       const { useState, useEffect, useRef } = React;
 
-      // --- DATA (Le tue poesie) ---
       const POEMS = [
         {
-          id: 'main-1',
-          title: "君の帰る場所",
-          content: `君が此処に居るだけで
-世界の真ん中が輝く
-君を微笑ませることは
-暗闇に太陽を灯すこと
+          id: 1,
+          title: "最愛の沙綾へ",
+          content: `古の詩人たちは、筆を執るとき、必ずミューズを呼び起こしたものです。神々の霊感を乞い、彼らの手に優美な詩を生み出す力を借りようとしたのです。彼らは、芸術は神からのみ流れ出るものであり、凡人の手が真に素晴らしいものを作るには天の導きが必要だと信じていました。
 
-それは毎日の朝が来る
-たった一つの楽しみ
-それは、大河の安らぎと強さに
-耳を澄まし、ただ見とれるよう
+          しかし、私は神話よりもはるかに素晴らしい真実を見つけました。
 
-言葉も要らない静かさで
-生きているだけで繋がる
-たとえ百万の星の海へ、君が逃げ去っても
-夜空が光を灯す度、私には分かる
+          オリンポスの神も、耳元で囁く天の精霊も必要ありません。心の奥底の思いを捉え、高く舞い上がるような言葉を綴りたいとき、私はただあなたのことを思えばいいのです。あなたこそが私のミューズであり、霊感であり、創作のすべての理由です。あなたの微笑みの中に詩を見出し、あなたの存在の中に、自分でも知らなかった雄弁さを見つけるのです。
 
-君だけを、必ず見つけ出す
-他の誰でもない君を
+          これらの言葉は、不十分かもしれませんが、すべてあなたに捧げます。沙綾、私が今まで出会った中で最も特別な人。あなたは教えてくれました。神々は遠い天に住まうのではなく、私たちが愛する人の形で、私たちの隣を歩いているのだと。
 
-だから落ちておいで
-君が流れ星になるなら
-この手で全て受け止めるから
-永遠に
-
-此処が君の帰る場所`,
+          驚きと愛を込めて、あなたのものより。`
         },
         {
-          id: 'main-2',
-          title: "君がくれる魔法",
+          id: 2,
+          title: "言葉の壁を超えて",
+          content: `言葉の壁を超えて、僕のシンプルな言葉に心を動かしてくれるさあや。
+
+          画面越しにふと静寂が訪れる時、僕はただ君の無邪気な瞳を見つめています。言葉はいらない。君がそこに存在すること、それ自体が息をのむような奇跡なんだ。
+
+          「綺麗だよ」と伝えると、君はいつも優しく笑って僕を「嘘つき」と言うね。でも、もし僕の目を借りて、君自身を見ることができたなら、どこまでも広がる海のように、限りない美しさがそこに見えるはずだよ。
+
+          君は神様が描いた傑作なのに、まだ自分ではそのことに気づいていないんだ。
+
+          不安になる夜は、どうかこれを思い出してほしい。僕は君の心を優しく受け止める「居場所」でありたいし、君の想いを満たす「光」でもありたい。波が岸へ戻るように、君の心はいつでも僕という場所に帰ってきていいんだよ。僕はどこへも行かない、いつも君の中にいるから。
+
+          今はまだ、遠く離れた空の下、別々の場所で同じ太陽を見上げているけれど、春の風が吹く頃には、僕たちはついに一つになれる。その時は、ただ見つめ合うだけでなく、肩を並べて、同じ夕日の美しさに一緒に心を震わせよう。
+
+          愛してる。`
+        },
+        {
+          id: 3,
+          title: "君の帰る場所",
+          content: `君が此処に居るだけで、世界の真ん中が輝く。
+
+          君を微笑ませることは、暗闇に太陽を灯すこと。それは毎日の朝が来る、たった一つの楽しみ。
+
+          それは、大河の安らぎと強さに耳を澄まし、ただ見とれるような感覚。
+
+          言葉も要らない静かさで、生きているだけで繋がる。
+
+          たとえ百万の星の海へ、君が逃げ去っても、夜空が光を灯す度、私には分かる。君だけを、必ず見つけ出す。他の誰でもない君を。
+
+          だから落ちておいで。
+
+          君が流れ星になるなら、この手で全て受け止めるから。永遠に。
+
+          此処が君の帰る場所。`
+        },
+        {
+          id: 4,
+          title: "愛の第三の道",
           content: `多くの人にとって、愛がどういうものなのかを考えていました。
-誰かに愛されていると感じた途端、もう「到達した」と思って努力をやめてしまう人がいます。
-反対に、ずっと走り続けて自分を高めようとする人もいるけれど、それは心の奥で「自分は十分じゃない」と怖がっていて、相手を失う不安に縛られているからなんだと思います。
 
-でも、君と一緒にいて、僕は第三の道を見つけました。
-それが、本当に大切な唯一の道です。
+          誰かに愛されていると感じた途端、もう「到達した」と思って努力をやめてしまう人がいます。反対に、ずっと走り続けて自分を高めようとする人もいるけれど、それは心の奥で「自分は十分じゃない」と怖がっていて、相手を失う不安に縛られているからなんだと思います。
 
-君はこの世界にあるすべての“いいもの”そのもので、欠点も含めて、ありのままの僕を受け入れてくれる。
-そしてね、その魔法はここにあります。
-君が僕に「変われ」と求めないこと。
-完全に受け入れられていると感じられること。
+          でも、君と一緒にいて、僕は第三の道を見つけました。それが、本当に大切な唯一の道です。
 
-それこそが、僕を「もっと良くなりたい」と思わせてくれるんです。
-怖いからじゃない。
-感謝しているから。
+          君はこの世界にあるすべての“いいもの”そのもので、欠点も含めて、ありのままの僕を受け入れてくれる。
 
-君の受け入れてくれる気持ちが、僕にとっていちばんの原動力です。
-義務だからじゃない。
-君にふさわしいものを、もっとたくさんあげたいと思うから。`,
+          そしてね、その魔法はここにあります。君が僕に「変われ」と求めないこと。完全に受け入れられていると感じられること。それこそが、僕を「もっと良くなりたい」と思わせてくれるんです。怖いからじゃない。感謝しているから。
+
+          君の受け入れてくれる気持ちが、僕にとっていちばんの原動力です。義務だからじゃない。君にふさわしいものを、もっとたくさんあげたいと思うから。`
+        },
+        {
+          id: 5,
+          title: "魂の鏡",
+          content: `君の瞳に、私は最も美しい世界を見る。それは、君の内面と外面の優雅さが織りなす錬金術によってのみ生み出される世界だ。君は単にこの世界に存在するのではない。君こそがその生きた詩であり、ありふれた瞬間を永遠の美に変える優しき力なのだ。
+
+          君の眼差しを見つめると、そこに無限そのものが映っている。君が触れるすべてに注ぐ、優しさと強さと光の果てしない水平線が。君の瞳は魂の窓であるだけでなく、宇宙があるべき姿、輝かしく、思いやりに満ち、無限に驚くべき姿を私に見せる鏡なのだ。
+
+          その中に、私は君の美しさだけでなく、人生を愛する価値のあるものにする本質そのものを見出す。`
         }
       ];
 
-      // --- ICONS (SVG Integrati per evitare errori) ---
-      const StarIcon = ({ className }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-        </svg>
-      );
-
-      const HeartIcon = ({ className, fill }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill={fill || "none"} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
-        </svg>
-      );
-
-      const ChevronDownIcon = ({ className }) => (
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-          <polyline points="6 9 12 15 18 9" />
-        </svg>
-      );
-
-      // --- COMPONENTS ---
-
-      // Background Component
       const StarryBackground = () => {
         const canvasRef = useRef(null);
-
         useEffect(() => {
           const canvas = canvasRef.current;
-          if (!canvas) return;
-
           const ctx = canvas.getContext('2d');
-          if (!ctx) return;
-
-          let animationFrameId;
           let stars = [];
-          let width = window.innerWidth;
-          let height = window.innerHeight;
-
-          const initStars = () => {
-            width = window.innerWidth;
-            height = window.innerHeight;
-            canvas.width = width;
-            canvas.height = height;
-            
-            const starCount = Math.floor((width * height) / 3000); 
-            stars = [];
-            for (let i = 0; i < starCount; i++) {
-              stars.push({
-                x: Math.random() * width,
-                y: Math.random() * height,
-                radius: Math.random() * 1.5 + 0.5,
-                opacity: Math.random(),
-                speed: Math.random() * 0.05 + 0.01,
-              });
-            }
+          const init = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            stars = Array.from({ length: 200 }, () => ({
+              x: Math.random() * canvas.width,
+              y: Math.random() * canvas.height,
+              size: Math.random() * 1.5,
+              speed: Math.random() * 0.5 + 0.1
+            }));
           };
-
-          const draw = () => {
-            ctx.clearRect(0, 0, width, height);
-            
-            const gradient = ctx.createLinearGradient(0, 0, 0, height);
-            gradient.addColorStop(0, '#050510');
-            gradient.addColorStop(1, '#1a1a2e');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, width, height);
-
+          const animate = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = '#ffffff';
-            
-            stars.forEach((star) => {
-              ctx.globalAlpha = star.opacity;
+            stars.forEach(s => {
+              ctx.globalAlpha = Math.random() * 0.5 + 0.5;
               ctx.beginPath();
-              ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+              ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
               ctx.fill();
-
-              star.opacity += (Math.random() - 0.5) * 0.05;
-              if (star.opacity < 0.1) star.opacity = 0.1;
-              if (star.opacity > 1) star.opacity = 1;
-
-              star.y -= star.speed;
-              if (star.y < 0) star.y = height;
+              s.y -= s.speed;
+              if (s.y < 0) s.y = canvas.height;
             });
-
-            animationFrameId = requestAnimationFrame(draw);
+            requestAnimationFrame(animate);
           };
-
-          initStars();
-          draw();
-
-          const handleResize = () => {
-            initStars();
-          };
-
-          window.addEventListener('resize', handleResize);
-
-          return () => {
-            window.removeEventListener('resize', handleResize);
-            cancelAnimationFrame(animationFrameId);
-          };
+          init(); animate();
+          window.addEventListener('resize', init);
+          return () => window.removeEventListener('resize', init);
         }, []);
-
-        return (
-          <canvas
-            ref={canvasRef}
-            className="fixed top-0 left-0 w-full h-full -z-10 pointer-events-none"
-          />
-        );
+        return <canvas ref={canvasRef} className="fixed inset-0 -z-10 opacity-40" />;
       };
 
-      // Poem Card Component
-      const PoemCard = ({ poem, isMain = false }) => {
-        return (
-          <div className={`relative p-8 md:p-12 rounded-lg backdrop-blur-sm bg-white/5 border border-white/10 shadow-2xl transition-all duration-700 hover:bg-white/10 ${isMain ? 'max-w-3xl' : 'max-w-xl'} mx-auto w-full`}>
-            {/* Decorative corners */}
-            <div className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-rose/50 rounded-tl-lg"></div>
-            <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-rose/50 rounded-tr-lg"></div>
-            <div className="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-rose/50 rounded-bl-lg"></div>
-            <div className="absolute bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-rose/50 rounded-br-lg"></div>
-
-            <div className="text-center mb-8">
-              <div className="inline-block animate-pulse">
-                <HeartIcon className="w-6 h-6 text-rose mx-auto mb-4" fill="#e17055" />
-              </div>
-              <h2 className={`font-display text-3xl md:text-4xl lg:text-5xl text-starlight mb-2 ${isMain ? 'tracking-widest' : ''}`}>
-                {poem.title}
-              </h2>
-              <div className="w-24 h-0.5 bg-gradient-to-r from-transparent via-rose to-transparent mx-auto mt-4"></div>
-            </div>
-
-            <div className="prose prose-invert mx-auto">
-              <p className="font-serif text-lg md:text-xl leading-loose text-gray-200 text-center whitespace-pre-line">
-                {poem.content}
-              </p>
-            </div>
-
-            {isMain && (
-              <div className="mt-12 text-center">
-                <p className="text-sm font-sans text-rose/80 tracking-widest uppercase">Forever Yours</p>
-              </div>
-            )}
-          </div>
-        );
-      };
-
-      // Main App Component
       const App = () => {
-        const poemRef = useRef(null);
-
-        const scrollToPoem = () => {
-          poemRef.current?.scrollIntoView({ behavior: 'smooth' });
-        };
+        const poemRefs = useRef([]);
+        const scrollTo = (index) => poemRefs.current[index]?.scrollIntoView({ behavior: 'smooth' });
 
         return (
-          <div className="min-h-screen relative text-starlight selection:bg-rose/30">
+          <div className="font-serif">
             <StarryBackground />
-
-            {/* Navigation / Header - Minimalist */}
-            <nav className="fixed top-0 w-full p-6 z-50 flex justify-between items-center mix-blend-difference opacity-0 animate-[fadeIn_2s_ease-in_forwards]">
-              <span className="font-display font-bold text-lg tracking-widest text-white">SAAYA</span>
-            </nav>
-
-            <main className="relative z-10">
-              {/* Hero Section */}
-              <section className="h-screen flex flex-col items-center justify-center relative px-4 text-center">
-                <div className="space-y-6 animate-[float_6s_ease-in-out_infinite]">
-                  <div className="flex justify-center mb-4">
-                    <StarIcon className="w-8 h-8 text-rose animate-twinkle" />
-                  </div>
-                  <h1 className="font-display text-5xl md:text-8xl lg:text-9xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-starlight via-white to-gray-400 drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
-                    さあやへ
-                  </h1>
-                  <p className="font-serif font-light text-lg md:text-2xl text-gray-400 max-w-lg mx-auto leading-relaxed">
-                    私が紡ぐ言葉はすべて、君のもとへ還る。
-                  </p>
-                </div>
-                
-                <button 
-                  onClick={scrollToPoem}
-                  className="absolute bottom-12 left-1/2 -translate-x-1/2 text-gray-500 hover:text-rose transition-colors duration-500 animate-bounce cursor-pointer"
-                  aria-label="Read Poem"
-                >
-                  <ChevronDownIcon className="w-10 h-10" />
-                </button>
-              </section>
-
-              {/* Poems Section */}
-              <div ref={poemRef} className="flex flex-col gap-20 py-20">
-                {POEMS.map((poem, index) => (
-                  <section key={poem.id} className="min-h-[80vh] flex items-center justify-center px-4 md:px-8">
-                    <PoemCard poem={poem} isMain={true} />
-                  </section>
-                ))}
+            
+            {/* Hero Section */}
+            <section className="h-screen flex flex-col items-center justify-center text-center px-4">
+              <div className="animate-float">
+                <div className="text-rose mb-6 text-4xl">✦</div>
+                <h1 className="text-6xl md:text-9xl font-display tracking-tighter mb-4 bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-500">
+                  さあやへ
+                </h1>
+                <p className="text-gray-400 text-lg md:text-xl max-w-md mx-auto leading-relaxed opacity-80">
+                  愛を込めて紡いだ五つの言葉。
+                </p>
               </div>
+              <button 
+                onClick={() => scrollTo(0)}
+                className="absolute bottom-12 animate-bounce text-rose/60 hover:text-rose transition-colors"
+              >
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+              </button>
+            </section>
 
-              {/* Footer */}
-              <footer className="py-12 text-center text-gray-600 font-sans text-xs tracking-widest uppercase">
-                <p>愛と星屑を込めて</p>
-              </footer>
-            </main>
+            {/* Poems */}
+            {POEMS.map((p, i) => (
+              <section 
+                key={p.id} 
+                ref={el => poemRefs.current[i] = el}
+                className="poem-section"
+              >
+                <div className="max-w-3xl w-full bg-white/5 backdrop-blur-md p-10 md:p-16 rounded-2xl border border-white/10 shadow-2xl hover:bg-white/[0.07] transition-all duration-1000 group">
+                  <div className="text-center mb-10">
+                    <span className="text-rose/40 text-xs tracking-[0.5em] uppercase mb-4 block">Poem {i + 1}</span>
+                    <h2 className="text-3xl md:text-5xl text-starlight mb-6 group-hover:text-rose transition-colors duration-700">{p.title}</h2>
+                    <div className="h-px w-20 bg-rose/30 mx-auto"></div>
+                  </div>
+                  <p className="text-lg md:text-xl leading-[2.2] text-gray-200 whitespace-pre-line text-justify md:text-center">
+                    {p.content}
+                  </p>
+                  <div className="mt-12 text-center opacity-40">
+                    <span className="text-xs tracking-widest">Aeternum</span>
+                  </div>
+                </div>
+              </section>
+            ))}
+
+            <footer className="py-20 text-center opacity-30 text-xs tracking-[1em] uppercase">
+              愛と星屑を込めて
+            </footer>
           </div>
         );
       };
 
       const root = ReactDOM.createRoot(document.getElementById('root'));
-      root.render(
-        <React.StrictMode>
-          <App />
-        </React.StrictMode>
-      );
+      root.render(<App />);
     </script>
   </body>
 </html>
